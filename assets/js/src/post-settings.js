@@ -10,26 +10,65 @@
 	 */
 	function updateButtonStatesForInput(input) {
 		const value = input.value;
+		const usedCtax = {
+			ctax: {
+				slug: false,
+				name: false,
+			},
+			ctax_parent: {
+				slug: false,
+				name: false,
+			},
+			ctax_parents: {
+				slug: false,
+				name: false,
+			},
+		};
+
+		value.replace(
+			/%(ctax(?:_parent|_parents)?)_([^%]+?)(?:(_name))?%/g,
+			function (_, type, taxonomy, namePart) {
+				if (namePart) {
+					usedCtax[type].name = true;
+				} else {
+					usedCtax[type].slug = true;
+				}
+			}
+		);
+
 		document.querySelectorAll(tagButtonSelector).forEach(function (button) {
-			let tag = button.getAttribute('data-name');
+			const tag = button.getAttribute('data-name');
+			button.classList.remove('active');
+
+			if (!tag) {
+				return;
+			}
+
 			if (value.includes(tag)) {
 				button.classList.add('active');
-			} else if (tag.startsWith('%ctax_')) {
-				tag = tag.replace('TAXONOMY_NAME%', '');
-				if (value.includes(tag)) {
+				return;
+			}
+
+			const match = tag.match(
+				/^%(ctax(?:_parent|_parents)?)_TAXONOMY_NAME(?:(_name))?%$/
+			);
+			if (match) {
+				const type = match[1];
+				const isNameButton = !!match[2];
+
+				if (
+					(isNameButton && usedCtax[type].name) ||
+					(!isNameButton && usedCtax[type].slug)
+				) {
 					button.classList.add('active');
-				} else {
-					button.classList.remove('active');
 				}
-			} else if (tag.startsWith('%custom_permalinks_')) {
-				tag = tag.replace('TAG_NAME%', '');
-				if (value.includes(tag)) {
+			}
+
+			if (tag.startsWith('%custom_permalinks_')) {
+				const customRegex = /%custom_permalinks_[^%]+%/;
+				if (customRegex.test(value)) {
 					button.classList.add('active');
-				} else {
-					button.classList.remove('active');
 				}
-			} else {
-				button.classList.remove('active');
 			}
 		});
 	}

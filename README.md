@@ -31,9 +31,12 @@ When setting up your custom permalink structures, you can use a variety of tags 
 | `%parent_postname%` | Similar to `%postname%`, but uses the immediate parent page's slug if a parent is selected. |
 | `%parents_postnames%` | Similar to `%postname%`, but includes all parent page slugs if parents are selected. |
 | `%title%` | The title of the post, converted to a slug. For example, "This Is A Great Post\!" becomes `this-is-a-great-post`. Unlike `%postname%` which is set once, `%title%` automatically updates in the permalink if the post title changes (unless the post is published or the permalink is manually edited). |
-| `%ctax_TAXONOMY_NAME%` | A clean version of a custom taxonomy's name. Replace `TAXONOMY_NAME` with the actual taxonomy name. You can also provide a default slug for when no category/taxonomy is selected by using `??` (e.g., `%ctax_type??sales%` will use "sales" as a default). |
-| `%ctax_parent_TAXONOMY_NAME%` | Similar to `%ctax_TAXONOMY_NAME%`, but includes the immediate parent category/tag slug in the URL if a parent is selected. |
-| `%ctax_parents_TAXONOMY_NAME%` | Similar to `%ctax_TAXONOMY_NAME%`, but includes all parent category/tag slugs in the URL if parents are selected. |
+| `%ctax_TAXONOMY_NAME%` | A clean version of a custom taxonomy term's **slug**. Replace `TAXONOMY_NAME` with the actual taxonomy name. You can also provide a default slug when no term is selected using `??` (e.g., `%ctax_type??sales%`). |
+| `%ctax_TAXONOMY_NAME_name%` | The custom taxonomy term's **name** (instead of its slug). Replace `TAXONOMY_NAME` with the actual taxonomy name. Supports a default value using `??` when no term is selected (e.g., `%ctax_type_name??Sales%`). |
+| `%ctax_parent_TAXONOMY_NAME%` | Similar to `%ctax_TAXONOMY_NAME%`, but includes the immediate parent term's slug in the URL if a parent is selected. |
+| `%ctax_parent_TAXONOMY_NAME_name%` | Similar to `%ctax_TAXONOMY_NAME_name%`, but includes the immediate parent term's **name** if a parent is selected. |
+| `%ctax_parents_TAXONOMY_NAME%` | Similar to `%ctax_TAXONOMY_NAME%`, but includes all parent term slugs in the URL if parents are selected. |
+| `%ctax_parents_TAXONOMY_NAME_name%` | Similar to `%ctax_TAXONOMY_NAME_name%`, but includes all parent term **names** if parents are selected. |
 | `%custom_permalinks_TAG_NAME%` | Developers have the flexibility to define their own custom tags(replace `_TAG_NAME` with your desired name). To ensure these tags resolve to the correct permalinks, simply apply the `custom_permalinks_post_permalink_tag` filter. |
 
 **Important Note:** For new posts, Custom Permalinks will keep updating the permalink while the post is in draft mode, assuming a structure is defined in the plugin settings. Once the post is published or its permalink is manually updated, the plugin will stop automatic updates for that specific post.

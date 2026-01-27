@@ -81,6 +81,16 @@ You have two ways to install Custom Permalinks:
 
 == Changelog ==
 
+= 3.2.0 =
+
+**Permalink Generation:**
+  * Added support for name-based custom taxonomy permalink tags:
+		* `%ctax_TAXONOMY_NAME_name%`
+		* `%ctax_parent_TAXONOMY_NAME_name%`
+		* `%ctax_parents_TAXONOMY_NAME_name%`
+	* Use multiple custom taxonomies tags at the same time in permalink
+	* Updated documentation to describe the new tags and clarify the difference between slug-based and name-based taxonomy tags.
+
 = 3.1.2 - Sep 24, 2025 =
 
 * Bug:

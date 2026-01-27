@@ -235,8 +235,11 @@ class Custom_Permalinks_Post_Types_Settings {
 										<li><button type="button" class="button button-secondary" data-name="%parents_postnames%">parents_postnames</button></li>
 										<li><button type="button" class="button button-secondary" data-name="%title%">title</button></li>
 										<li><button type="button" class="button button-secondary" data-name="%ctax_TAXONOMY_NAME%">ctax_TAXONOMY_NAME</button></li>
+										<li><button type="button" class="button button-secondary" data-name="%ctax_TAXONOMY_NAME_name%">ctax_TAXONOMY_NAME_name</button></li>
 										<li><button type="button" class="button button-secondary" data-name="%ctax_parent_TAXONOMY_NAME%">ctax_parent_TAXONOMY_NAME</button></li>
+										<li><button type="button" class="button button-secondary" data-name="%ctax_parent_TAXONOMY_NAME_name%">ctax_parent_TAXONOMY_NAME_name</button></li>
 										<li><button type="button" class="button button-secondary" data-name="%ctax_parents_TAXONOMY_NAME%">ctax_parents_TAXONOMY_NAME</button></li>
+										<li><button type="button" class="button button-secondary" data-name="%ctax_parents_TAXONOMY_NAME_name%">ctax_parents_TAXONOMY_NAME_name</button></li>
 										<li><button type="button" class="button button-secondary" data-name="%custom_permalinks_TAG_NAME%">custom_permalinks_TAG_NAME</button></li>
 									</ul>
 								</td>

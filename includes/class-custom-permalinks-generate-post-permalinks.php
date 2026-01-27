@@ -113,34 +113,64 @@ final class Custom_Permalinks_Generate_Post_Permalinks {
 			$replace_tag = str_replace( '%category%', $category, $replace_tag );
 		}
 
-		// Handle %ctax_parent_TAXONOMY_NAME%.
+		// Handle %ctax_parent_TAXONOMY_NAME% and %ctax_parent_TAXONOMY_NAME_name%.
 		if ( false !== strpos( $replace_tag, '%ctax_parent_' ) ) {
+			// Handle %ctax_parent_TAXONOMY_NAME_name%.
+			preg_match_all( '/%ctax_parent_([^%]+)_name%/', $replace_tag, $matches );
+			if ( isset( $matches[1] ) && ! empty( $matches[1] ) ) {
+				foreach ( $matches[1] as $match ) {
+					$category    = $this->get_taxonomy_slug( $post_id, $match, 'immediate', 'name' );
+					$replace_tag = str_replace( "%ctax_parent_{$match}_name%", $category, $replace_tag );
+				}
+			}
+
+			// Handle %ctax_parent_TAXONOMY_NAME%.
 			preg_match_all( '/%ctax_parent_([^%]+)%/', $replace_tag, $matches );
 			if ( isset( $matches[1] ) && ! empty( $matches[1] ) ) {
 				foreach ( $matches[1] as $match ) {
-					$category    = $this->get_taxonomy_slug( $post_id, $match, 'immediate' );
+					$category    = $this->get_taxonomy_slug( $post_id, $match, 'immediate', 'slug' );
 					$replace_tag = str_replace( "%ctax_parent_{$match}%", $category, $replace_tag );
 				}
 			}
 		}
 
-		// Handle %ctax_parents_TAXONOMY_NAME%.
+		// Handle %ctax_parents_TAXONOMY_NAME% and %ctax_parents_TAXONOMY_NAME_name%.
 		if ( false !== strpos( $replace_tag, '%ctax_parents_' ) ) {
+			// Handle %ctax_parents_TAXONOMY_NAME_name%.
+			preg_match_all( '/%ctax_parents_([^%]+)_name%/', $replace_tag, $matches );
+			if ( isset( $matches[1] ) && ! empty( $matches[1] ) ) {
+				foreach ( $matches[1] as $match ) {
+					$category    = $this->get_taxonomy_slug( $post_id, $match, 'all', 'name' );
+					$replace_tag = str_replace( "%ctax_parents_{$match}_name%", $category, $replace_tag );
+				}
+			}
+
+			// Handle %ctax_parents_TAXONOMY_NAME%.
 			preg_match_all( '/%ctax_parents_([^%]+)%/', $replace_tag, $matches );
 			if ( isset( $matches[1] ) && ! empty( $matches[1] ) ) {
 				foreach ( $matches[1] as $match ) {
-					$category    = $this->get_taxonomy_slug( $post_id, $match, 'all' );
+					$category    = $this->get_taxonomy_slug( $post_id, $match, 'all', 'slug' );
 					$replace_tag = str_replace( "%ctax_parents_{$match}%", $category, $replace_tag );
 				}
 			}
 		}
 
-		// Handle %ctax_TAXONOMY_NAME%.
+		// Handle %ctax_TAXONOMY_NAME% and %ctax_TAXONOMY_NAME_name%.
 		if ( false !== strpos( $replace_tag, '%ctax_' ) ) {
+			// Handle %ctax_TAXONOMY_NAME_name%.
+			preg_match_all( '/%ctax_([^%]+)_name%/', $replace_tag, $matches );
+			if ( isset( $matches[1] ) && ! empty( $matches[1] ) ) {
+				foreach ( $matches[1] as $match ) {
+					$category    = $this->get_taxonomy_slug( $post_id, $match, 'immediate', 'name' );
+					$replace_tag = str_replace( "%ctax_{$match}_name%", $category, $replace_tag );
+				}
+			}
+
+			// Handle %ctax_TAXONOMY_NAME%.
 			preg_match_all( '/%ctax_([^%]+)%/', $replace_tag, $matches );
 			if ( isset( $matches[1] ) && ! empty( $matches[1] ) ) {
 				foreach ( $matches[1] as $match ) {
-					$category    = $this->get_taxonomy_slug( $post_id, $match, 'immediate' );
+					$category    = $this->get_taxonomy_slug( $post_id, $match, 'immediate', 'slug' );
 					$replace_tag = str_replace( "%ctax_{$match}%", $category, $replace_tag );
 				}
 			}
@@ -157,6 +187,8 @@ final class Custom_Permalinks_Generate_Post_Permalinks {
 				}
 			}
 		}
+
+		$replace_tag = preg_replace( '/\/{2,}/', '/', $replace_tag );
 
 		return $replace_tag;
 	}
@@ -274,10 +306,11 @@ final class Custom_Permalinks_Generate_Post_Permalinks {
 	 * @param int    $post_id     Post ID.
 	 * @param string $taxonomy    Taxonomy name.
 	 * @param string $parent_type Whether to include immediate parent or all or none.
+	 * @param string $name        Field name used as slug.
 	 *
 	 * @return string
 	 */
-	private function get_taxonomy_slug( $post_id, $taxonomy, $parent_type ) {
+	private function get_taxonomy_slug( $post_id, $taxonomy, $parent_type, $name ) {
 		$slug  = '';
 		$terms = get_the_terms( $post_id, $taxonomy );
 
@@ -303,7 +336,12 @@ final class Custom_Permalinks_Generate_Post_Permalinks {
 			}
 		}
 
-		$slug = $selected->slug;
+		if ( 'name' === $name ) {
+			$slug = sanitize_title( $selected->name );
+		} else {
+			$slug = $selected->slug;
+		}
+
 		if ( $selected->parent ) {
 			if ( 'all' === $parent_type ) {
 				$parents = get_ancestors( $selected->term_id, $taxonomy, 'taxonomy' );
@@ -313,8 +351,13 @@ final class Custom_Permalinks_Generate_Post_Permalinks {
 						function ( $pid ) {
 							$term      = get_term( $pid );
 							$term_slug = '';
-							if ( is_object( $term, $term->slug ) ) {
-								$term_slug = $term->slug;
+
+							if ( is_object( $term ) && isset( $term->name, $term->slug ) ) {
+								if ( 'name' === $name ) {
+									$term_slug = sanitize_title( $term->name );
+								} else {
+									$term_slug = $term->slug;
+								}
 							}
 
 							return $term_slug;
@@ -327,7 +370,11 @@ final class Custom_Permalinks_Generate_Post_Permalinks {
 			} elseif ( 'immediate' === $parent_type ) {
 				$parent = get_term( $selected->parent );
 				if ( $parent ) {
-					$slug = $parent->slug . '/' . $slug;
+					if ( 'name' === $name ) {
+						$slug = sanitize_title( $parent->name ) . '/' . $slug;
+					} else {
+						$slug = $parent->slug . '/' . $slug;
+					}
 				}
 			}
 		}
