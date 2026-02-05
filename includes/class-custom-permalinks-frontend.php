@@ -553,6 +553,19 @@ class Custom_Permalinks_Frontend {
 			 */
 			if ( ! empty( $found_permalink ) && $found_permalink !== $request ) {
 				$this->parse_request_status = false;
+
+				/*
+				 * Force redirect if requested permalink and found permalink only
+				 * differs by trailing slash.
+				 */
+				$permalink_without_trailing = rtrim( $found_permalink, '/' );
+				if ( $permalink_without_trailing === $request
+					|| $permalink_without_trailing . '/' === $request
+				) {
+					$this->safe_redirect( $found_permalink );
+
+					return $query;
+				}
 			}
 
 			$original_url = str_replace( '//', '/', $original_url );
