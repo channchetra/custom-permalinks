@@ -479,18 +479,18 @@ class Custom_Permalinks_Form {
 	 */
 	private function clear_post_permalink_cache( $cached_permalink ) {
 		if ( ! empty( $cached_permalink ) ) {
-			$cached_permalinks = array( $cached_permalink );
 			$trimmed_permalink = untrailingslashit( $cached_permalink );
-			if ( $trimmed_permalink !== $cached_permalink ) {
-				$cached_permalinks[] = $trimmed_permalink;
-			}
+			$cached_permalinks = array_unique(
+				array(
+					$cached_permalink,
+					$trimmed_permalink,
+					trailingslashit( $trimmed_permalink ),
+				)
+			);
 
 			foreach ( $cached_permalinks as $permalink ) {
-				$cache_name   = 'cp$_' . str_replace( '/', '-', $permalink ) . '_#cp';
-				$cache_exists = wp_cache_get( $cache_name, 'custom_permalinks' );
-				if ( false !== $cache_exists ) {
-					wp_cache_delete( $cache_name, 'custom_permalinks' );
-				}
+				$cache_name = 'cp$_' . str_replace( '/', '-', $permalink ) . '_#cp';
+				wp_cache_delete( $cache_name, 'custom_permalinks' );
 			}
 		}
 	}
