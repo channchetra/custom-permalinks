@@ -479,12 +479,11 @@ class Custom_Permalinks_Form {
 	 */
 	private function clear_post_permalink_cache( $cached_permalink ) {
 		if ( ! empty( $cached_permalink ) ) {
-			$cached_permalinks = array_unique(
-				array(
-					$cached_permalink,
-					untrailingslashit( $cached_permalink ),
-				)
-			);
+			$cached_permalinks = array( $cached_permalink );
+			$trimmed_permalink = untrailingslashit( $cached_permalink );
+			if ( $trimmed_permalink !== $cached_permalink ) {
+				$cached_permalinks[] = $trimmed_permalink;
+			}
 
 			foreach ( $cached_permalinks as $permalink ) {
 				$cache_name   = 'cp$_' . str_replace( '/', '-', $permalink ) . '_#cp';
