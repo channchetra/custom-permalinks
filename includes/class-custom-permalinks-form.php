@@ -479,10 +479,19 @@ class Custom_Permalinks_Form {
 	 */
 	private function clear_post_permalink_cache( $cached_permalink ) {
 		if ( ! empty( $cached_permalink ) ) {
-			$cache_name   = 'cp$_' . str_replace( '/', '-', $cached_permalink ) . '_#cp';
-			$cache_exists = wp_cache_get( $cache_name, 'custom_permalinks' );
-			if ( false !== $cache_exists ) {
-				wp_cache_delete( $cache_name, 'custom_permalinks' );
+			$cached_permalinks = array_unique(
+				array(
+					$cached_permalink,
+					untrailingslashit( $cached_permalink ),
+				)
+			);
+
+			foreach ( $cached_permalinks as $permalink ) {
+				$cache_name   = 'cp$_' . str_replace( '/', '-', $permalink ) . '_#cp';
+				$cache_exists = wp_cache_get( $cache_name, 'custom_permalinks' );
+				if ( false !== $cache_exists ) {
+					wp_cache_delete( $cache_name, 'custom_permalinks' );
+				}
 			}
 		}
 	}
